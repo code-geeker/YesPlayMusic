@@ -304,6 +304,7 @@
             >断开连接
           </button>
           <button v-else @click="connectHA()"> 授权连接 </button>
+          <button @click="testplay()">测试播放</button>
         </div>
       </div>
 
@@ -569,11 +570,6 @@
       </div>
 
       <div class="footer">
-        <div
-          ><table><tbody></tbody></table
-        ></div>
-        <button onclick="connect_ha()">Connect to HA</button>
-        <button onclick="connection.reconnect()">Reconnect</button>
         <p class="author"
           >MADE BY
           <a href="http://github.com/qier222" target="_blank">Elliot</a></p
@@ -1056,6 +1052,9 @@ export default {
     connectHA() {
       connect_ha();
     },
+    testplay() {
+      play_media();
+    },
     lastfmDisconnect() {
       localStorage.removeItem('lastfm');
       this.$store.commit('updateLastfm', {});
@@ -1207,38 +1206,36 @@ async function connect_ha() {
   });
 }
 
+function play_media() {
+  callService(
+    window.connection,
+    'media_player',
+    'play_media',
+    {
+      media_content_id:
+        'http://other.player.rc03.sycdn.kuwo.cn/522d5f165f2fb24eab7c015b24832669/6248e6d9/resource/s2/43/3/846522351.flac',
+      media_content_type: 'music',
+    },
+    {
+      entity_id: 'media_player.alexelec',
+    }
+  );
+}
+
 function renderEntities(connection, entities) {
   window.entities = entities;
-  const root = document.querySelector('tbody');
-  while (root.lastChild) root.removeChild(root.lastChild);
 
   Object.keys(entities)
     .sort()
     .forEach(entId => {
-      const tr = document.createElement('tr');
-
-      const tdName = document.createElement('td');
-      tdName.innerHTML = entId;
-      tr.appendChild(tdName);
-
-      const tdState = document.createElement('td');
-      const text = document.createTextNode(entities[entId].state);
-      tdState.appendChild(text);
-
       if (
-        ['switch', 'light', 'input_boolean'].includes(entId.split('.', 1)[0])
+        ['media_player'].includes(entId.split('.', 1)[0]) &&
+        entities[entId].state != 'off' &&
+        entities[entId].state != 'unavailable'
       ) {
-        const button = document.createElement('button');
-        button.innerHTML = 'toggle';
-        button.onclick = () =>
-          callService(connection, 'homeassistant', 'toggle', {
-            entity_id: entId,
-          });
-        tdState.appendChild(button);
+        console.log(entId, entities[entId].state);
+        // const button = document.createElement('option');
       }
-      tr.appendChild(tdState);
-
-      root.appendChild(tr);
     });
 }
 </script>

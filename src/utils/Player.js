@@ -10,6 +10,11 @@ import store from '@/store';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { trackUpdateNowPlaying, trackScrobble } from '@/api/lastfm';
 import { isCreateMpris, isCreateTray } from '@/utils/platform';
+import {
+  callService,
+  //subscribeEntities,
+  //ERR_HASS_HOST_REQUIRED,
+} from 'home-assistant-js-websocket';
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -411,6 +416,19 @@ export default class {
         if (source) {
           this._playAudioSource(source, autoplay);
           this._cacheNextTrack();
+          callService(
+            window.connection,
+            'media_player',
+            'play_media',
+            {
+              media_content_id: String(source),
+              media_content_type: 'music',
+            },
+            {
+              entity_id: 'media_player.alexelec',
+            }
+          );
+
           return source;
         } else {
           store.dispatch('showToast', `无法播放 ${track.name}`);
