@@ -292,6 +292,21 @@
           <button v-else @click="lastfmConnect()"> 授权连接 </button>
         </div>
       </div>
+
+      <div class="item">
+        <div class="left">
+          <div class="title">
+            {{ isConnectedHA ? `已连接到 HA` : '连接 HA' }}</div
+          >
+        </div>
+        <div class="right">
+          <button v-if="isConnectedHA" @click="DisconnectHA()"
+            >断开连接
+          </button>
+          <button v-else @click="connectHA()"> 授权连接 </button>
+        </div>
+      </div>
+
       <div v-if="isElectron" class="item">
         <div class="left">
           <div class="title">
@@ -1037,6 +1052,9 @@ export default {
           clearInterval(lastfmChecker);
         }
       }, 1000);
+    },
+    connectHA() {
+      connect_ha();
     },
     lastfmDisconnect() {
       localStorage.removeItem('lastfm');
