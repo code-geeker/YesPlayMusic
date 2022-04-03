@@ -554,9 +554,14 @@
       </div>
 
       <div class="footer">
+        <div
+          ><table><tbody></tbody></table
+        ></div>
+        <button onclick="connect_ha()">Connect to HA</button>
+        <button onclick="connection.reconnect()">Reconnect</button>
         <p class="author"
           >MADE BY
-          <a href="http://github.com/qier222" target="_blank">QIER222</a></p
+          <a href="http://github.com/qier222" target="_blank">Elliot</a></p
         >
         <p class="version">v{{ version }}</p>
       </div>
@@ -571,6 +576,14 @@ import { auth as lastfmAuth } from '@/api/lastfm';
 import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
+import {
+  getAuth,
+  getUser,
+  callService,
+  createConnection,
+  subscribeEntities,
+  ERR_HASS_HOST_REQUIRED,
+} from 'home-assistant-js-websocket';
 
 const electron =
   process.env.IS_ELECTRON === true ? window.require('electron') : null;
@@ -1122,6 +1135,94 @@ export default {
     },
   },
 };
+
+async function connect_ha() {
+  let auth;
+  const storeAuth = true;
+  const authOptions = storeAuth
+    ? {
+        async loadTokens() {
+          try {
+            return JSON.parse(localStorage.hassTokens);
+          } catch (err) {
+            return undefined;
+          }
+        },
+        saveTokens: tokens => {
+          localStorage.hassTokens = JSON.stringify(tokens);
+        },
+      }
+    : {};
+  try {
+    auth = await getAuth(authOptions);
+  } catch (err) {
+    if (err === ERR_HASS_HOST_REQUIRED) {
+      authOptions.hassUrl = prompt(
+        'What host to connect to?',
+        'https://myha.me'
+      );
+      if (!authOptions.hassUrl) return;
+      auth = await getAuth(authOptions);
+    } else {
+      alert(`Unknown error: ${err}`);
+      return;
+    }
+  }
+  const connection = await createConnection({ auth });
+  for (const ev of ['disconnected', 'ready', 'reconnect-error']) {
+    connection.addEventListener(ev, () => console.log(`Event: ${ev}`));
+  }
+  subscribeEntities(connection, entities =>
+    renderEntities(connection, entities)
+  );
+  // Clear url if we have been able to establish a connection
+  if (location.search.includes('auth_callback=1')) {
+    history.replaceState(null, '', location.pathname);
+  }
+
+  // To play from the console
+  window.auth = auth;
+  window.connection = connection;
+  getUser(connection).then(user => {
+    console.log('Logged in as', user);
+    window.user = user;
+  });
+}
+
+function renderEntities(connection, entities) {
+  window.entities = entities;
+  const root = document.querySelector('tbody');
+  while (root.lastChild) root.removeChild(root.lastChild);
+
+  Object.keys(entities)
+    .sort()
+    .forEach(entId => {
+      const tr = document.createElement('tr');
+
+      const tdName = document.createElement('td');
+      tdName.innerHTML = entId;
+      tr.appendChild(tdName);
+
+      const tdState = document.createElement('td');
+      const text = document.createTextNode(entities[entId].state);
+      tdState.appendChild(text);
+
+      if (
+        ['switch', 'light', 'input_boolean'].includes(entId.split('.', 1)[0])
+      ) {
+        const button = document.createElement('button');
+        button.innerHTML = 'toggle';
+        button.onclick = () =>
+          callService(connection, 'homeassistant', 'toggle', {
+            entity_id: entId,
+          });
+        tdState.appendChild(button);
+      }
+      tr.appendChild(tdState);
+
+      root.appendChild(tr);
+    });
+}
 </script>
 
 <style lang="scss" scoped>
