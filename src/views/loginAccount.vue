@@ -186,10 +186,11 @@ export default {
         this.processing = this.validatePhone();
         if (!this.processing) return;
         loginWithPhone({
-          countrycode: this.countryCode.replace('+', '').replace(/\s/g, ''),
+          //countrycode: this.countryCode.replace('+', '').replace(/\s/g, ''),
           phone: this.phoneNumber.replace(/\s/g, ''),
-          password: 'fakePassword',
-          md5_password: md5(this.password).toString(),
+          password: this.password.toString(),
+          //password: 'fakePassword',
+          //md5_password: md5(this.password).toString(),
         })
           .then(this.handleLoginResponse)
           .catch(error => {
