@@ -295,16 +295,37 @@
 
       <div class="item">
         <div class="left">
-          <div class="title">
-            {{ isConnectedHA ? `已连接到 HA` : '连接 HA' }}</div
-          >
+          <div class="title"> 授权连接 HA</div>
         </div>
         <div class="right">
           <button v-if="isConnectedHA" @click="DisconnectHA()"
             >断开连接
           </button>
-          <button v-else @click="connectHA()"> 授权连接 </button>
-          <button @click="testplay()">测试播放</button>
+
+          <div class="right">
+            <div class="toggle">
+              <input
+                id="connectHA"
+                v-model="connectHA"
+                type="checkbox"
+                name="connectHA"
+              />
+              <label for="connectHA"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="connectHA" class="item">
+        <div class="left">
+          <div class="title"> 选择播放源</div>
+        </div>
+        <div class="right">
+          <div class="devices">
+            <select name="devices" id="devices">
+              <option value="">kodi</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -587,14 +608,13 @@ import { auth as lastfmAuth } from '@/api/lastfm';
 import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
-import {
+/*import {
   getAuth,
   getUser,
-  callService,
   createConnection,
   subscribeEntities,
   ERR_HASS_HOST_REQUIRED,
-} from 'home-assistant-js-websocket';
+} from 'home-assistant-js-websocket'; */
 
 const electron =
   process.env.IS_ELECTRON === true ? window.require('electron') : null;
@@ -809,6 +829,17 @@ export default {
         if (value === false) {
           this.clearCache();
         }
+      },
+    },
+    connectHA: {
+      get() {
+        return this.settings.connectHA;
+      },
+      set(value) {
+        this.$store.commit('updateSettings', {
+          key: 'connectHA',
+          value,
+        });
       },
     },
     showLyricsTranslation: {
@@ -1049,12 +1080,6 @@ export default {
         }
       }, 1000);
     },
-    connectHA() {
-      connect_ha();
-    },
-    testplay() {
-      play_media();
-    },
     lastfmDisconnect() {
       localStorage.removeItem('lastfm');
       this.$store.commit('updateLastfm', {});
@@ -1153,7 +1178,7 @@ export default {
   },
 };
 
-async function connect_ha() {
+/*async function connect_ha() {
   let auth;
   const storeAuth = true;
   const authOptions = storeAuth
@@ -1206,22 +1231,6 @@ async function connect_ha() {
   });
 }
 
-function play_media() {
-  callService(
-    window.connection,
-    'media_player',
-    'play_media',
-    {
-      media_content_id:
-        'http://other.player.rc03.sycdn.kuwo.cn/522d5f165f2fb24eab7c015b24832669/6248e6d9/resource/s2/43/3/846522351.flac',
-      media_content_type: 'music',
-    },
-    {
-      entity_id: 'media_player.alexelec',
-    }
-  );
-}
-
 function renderEntities(connection, entities) {
   window.entities = entities;
 
@@ -1237,7 +1246,7 @@ function renderEntities(connection, entities) {
         // const button = document.createElement('option');
       }
     });
-}
+} */
 </script>
 
 <style lang="scss" scoped>
