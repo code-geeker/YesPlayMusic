@@ -322,8 +322,14 @@
         </div>
         <div class="right">
           <div class="devices">
-            <select name="devices" id="devices">
-              <option value="">kodi</option>
+            <select name="devices" id="devices" v-model="devices">
+              <option
+                v-for="(device, index) in available_entities"
+                :key="`${index}`"
+                :value="`${device}`"
+              >
+                {{ device }}
+              </option>
             </select>
           </div>
         </div>
@@ -608,13 +614,7 @@ import { auth as lastfmAuth } from '@/api/lastfm';
 import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
-/*import {
-  getAuth,
-  getUser,
-  createConnection,
-  subscribeEntities,
-  ERR_HASS_HOST_REQUIRED,
-} from 'home-assistant-js-websocket'; */
+import { subscribeEntities } from 'home-assistant-js-websocket';
 
 const electron =
   process.env.IS_ELECTRON === true ? window.require('electron') : null;
@@ -643,6 +643,7 @@ export default {
         recording: false,
       },
       recordedShortcut: [],
+      available_entities: [],
     };
   },
   computed: {
@@ -842,6 +843,17 @@ export default {
         });
       },
     },
+    devices: {
+      get() {
+        return this.settings.devices;
+      },
+      set(value) {
+        this.$store.commit('updateSettings', {
+          key: 'devices',
+          value,
+        });
+      },
+    },
     showLyricsTranslation: {
       get() {
         return this.settings.showLyricsTranslation;
@@ -1018,6 +1030,11 @@ export default {
       return this.lastfm.key !== undefined;
     },
   },
+  mounted() {
+    subscribeEntities(window.connection, entities =>
+      this.renderEntities(entities)
+    );
+  },
   created() {
     this.countDBSize('tracks');
     if (process.env.IS_ELECTRON) this.getAllOutputDevices();
@@ -1047,6 +1064,27 @@ export default {
           ];
         }
       });
+    },
+    renderEntities(entities) {
+      Object.keys(entities)
+        .sort()
+        .forEach(entId => {
+          if (
+            ['media_player'].includes(entId.split('.', 1)[0]) &&
+            entities[entId].state != 'off' &&
+            entities[entId].state != 'unavailable'
+          ) {
+            //判断是否已经存在
+            if (this.available_entities.indexOf(entId) === -1) {
+              this.available_entities.push(entId);
+              //console.log(this.available_entities);
+            }
+            if (this.available_entities.indexOf('none') === -1) {
+              this.available_entities.unshift('none');
+              //console.log(this.available_entities);
+            }
+          }
+        });
     },
     logout() {
       doLogout();

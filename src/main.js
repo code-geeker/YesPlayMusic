@@ -15,7 +15,7 @@ import {
   getAuth,
   getUser,
   createConnection,
-  subscribeEntities,
+  // subscribeEntities,
   ERR_HASS_HOST_REQUIRED,
 } from 'home-assistant-js-websocket';
 
@@ -48,9 +48,6 @@ new Vue({
   i18n,
   store,
   router,
-  data: {
-    available_entities: available_entities,
-  },
   mounted: function () {
     if (store.state.settings.connectHA) {
       connectToHA();
@@ -95,9 +92,9 @@ async function connectToHA() {
   for (const ev of ['disconnected', 'ready', 'reconnect-error']) {
     connection.addEventListener(ev, () => console.log(`Event: ${ev}`));
   }
-  subscribeEntities(connection, entities =>
-    renderEntities(connection, entities)
-  );
+  // subscribeEntities(connection, entities =>
+  //   renderEntities(connection, entities)
+  // );
   // Clear url if we have been able to establish a connection
   if (location.search.includes('auth_callback=1')) {
     history.replaceState(null, '', location.pathname);
@@ -112,7 +109,7 @@ async function connectToHA() {
   });
 }
 
-const available_entities = new Array();
+/*const available_entities = new Array();
 function renderEntities(connection, entities) {
   window.entities = entities;
   Object.keys(entities)
@@ -130,7 +127,7 @@ function renderEntities(connection, entities) {
         }
       }
     });
-}
+} */
 
 if (store.state.settings.connectHA) {
   //const ele_device = document.querySelector('#devices');

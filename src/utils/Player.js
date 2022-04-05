@@ -416,18 +416,24 @@ export default class {
         if (source) {
           this._playAudioSource(source, autoplay);
           this._cacheNextTrack();
-          callService(
-            window.connection,
-            'media_player',
-            'play_media',
-            {
-              media_content_id: String(source),
-              media_content_type: 'music',
-            },
-            {
-              entity_id: 'media_player.alexelec',
-            }
-          );
+          console.log(store.state.settings.devices);
+          if (
+            store.state.settings.connectHA &&
+            store.state.settings.devices !== 'none'
+          ) {
+            callService(
+              window.connection,
+              'media_player',
+              'play_media',
+              {
+                media_content_id: String(source),
+                media_content_type: 'music',
+              },
+              {
+                entity_id: store.state.settings.devices,
+              }
+            );
+          }
 
           return source;
         } else {
