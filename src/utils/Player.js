@@ -416,11 +416,11 @@ export default class {
         if (source) {
           this._playAudioSource(source, autoplay);
           this._cacheNextTrack();
-          console.log('正在使用 %s 源播放', store.state.settings.devices);
           if (
             store.state.settings.connectHA &&
             store.state.settings.devices !== 'none'
           ) {
+            console.log('正在使用 %s 源播放', store.state.settings.devices);
             callService(
               window.connection,
               'media_player',
