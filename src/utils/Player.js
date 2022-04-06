@@ -361,6 +361,7 @@ export default class {
         if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
         //const source = result.data[0].url.replace(/^http:/, 'https:');
         const source = result.data[0].url;
+        console.log('歌曲url: %s ', source);
         if (store.state.settings.automaticallyCacheSongs) {
           cacheTrackSource(track, source, result.data[0].br);
         }
