@@ -31,7 +31,7 @@ service.interceptors.request.use(function (config) {
   }
 
   if (!process.env.IS_ELECTRON && !config.url.includes('/login')) {
-    config.params.realIP = '60.1.132.16';
+    config.params.realIP = '55.2.132.165';
   }
 
   const proxy = JSON.parse(localStorage.getItem('settings')).proxyConfig;
