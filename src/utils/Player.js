@@ -385,6 +385,7 @@ export default class {
   }
   _getAudioSourceFromCache(id) {
     return getTrackSource(id).then(t => {
+	  console.log(t);
       if (!t) return null;
       return this._getAudioSourceBlobURL(t.source);
     });
@@ -397,7 +398,7 @@ export default class {
         if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
         //const source = result.data[0].url.replace(/^http:/, 'https:');
         const source = result.data[0].url;
-        console.log('歌曲url: %s ', source);
+        console.log(result.data[0]);
         if (store.state.settings.automaticallyCacheSongs) {
           cacheTrackSource(track, source, result.data[0].br);
         }
@@ -518,6 +519,7 @@ export default class {
   ) {
     return this._getAudioSource(track).then(source => {
       if (source) {
+        console.log('歌曲url: %s ', source);
         let replaced = false;
         if (track.id === this.currentTrackID) {
           this._playAudioSource(source, autoplay);
