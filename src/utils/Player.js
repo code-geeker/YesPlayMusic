@@ -526,6 +526,26 @@ export default class {
         if (isCacheNextTrack) {
           this._cacheNextTrack();
         }
+
+	  if (
+		  store.state.settings.connectHA &&
+		  store.state.settings.devices !== 'none'
+	  ) {
+		  console.log('正在使用 %s 源播放', store.state.settings.devices);
+		  callService(
+			  window.connection,
+			  'media_player',
+			  'play_media',
+			  {
+				  media_content_id: String(source),
+				  media_content_type: 'music',
+			  },
+			  {
+				  entity_id: store.state.settings.devices,
+			  }
+		  );
+	  }
+
         return replaced;
       } else {
         store.dispatch('showToast', `无法播放 ${track.name}`);
