@@ -385,7 +385,7 @@ export default class {
   }
   _getAudioSourceFromCache(id) {
     return getTrackSource(id).then(t => {
-	  console.log(t);
+      console.log(t);
       if (!t) return null;
       return this._getAudioSourceBlobURL(t.source);
     });
@@ -406,7 +406,7 @@ export default class {
       });
     } else {
       return new Promise(resolve => {
-        resolve(`https://music.163.com/song/media/outer/url?id=${track.id}`);
+        resolve(`http://music.163.com/song/media/outer/url?id=${track.id}`);
       });
     }
   }
