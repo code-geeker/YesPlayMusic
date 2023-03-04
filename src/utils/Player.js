@@ -389,7 +389,7 @@ export default class {
   }
   _getAudioSourceFromCache(id) {
     return getTrackSource(id).then(t => {
-      console.log(t);
+      //console.log(t);
       if (!t) return null;
       return this._getAudioSourceBlobURL(t.source);
     });
