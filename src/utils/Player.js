@@ -362,9 +362,25 @@ export default class {
       }
     });
 
-    this._howler.on('seek', id => {
+    this._howler.on('seek', () => {
       const s = this.seek();
-      console.log(id, s);
+      console.log('seek to %s', s);
+      if (
+        store.state.settings.connectHA &&
+        store.state.settings.devices !== 'none'
+      ) {
+        callService(
+          window.connection,
+          'media_player',
+          'media_seek',
+          {
+            seek_position: s,
+          },
+          {
+            entity_id: store.state.settings.devices,
+          }
+        );
+      }
     });
 
     if (autoplay) {
