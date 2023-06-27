@@ -361,6 +361,12 @@ export default class {
         );
       }
     });
+
+    this._howler.on('seek', id => {
+      const t = this.progress;
+      console.log(id, t);
+    });
+
     if (autoplay) {
       this.play();
       if (this._currentTrack.name) {
