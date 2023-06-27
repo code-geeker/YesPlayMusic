@@ -363,8 +363,9 @@ export default class {
     });
 
     this._howler.on('seek', id => {
-      const t = this.progress;
-      console.log(id, t);
+      //const t = this.progress;
+      const s = localStorage.getItem('playerCurrentTrackTime') ?? 0;
+      console.log(id, s);
     });
 
     if (autoplay) {
