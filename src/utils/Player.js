@@ -338,6 +338,11 @@ export default class {
         this._nextTrackCallback();
       },
     });
+
+    this._howler.on('load', () => {
+      console.log('load', source);
+    });
+
     this._howler.on('loaderror', (_, errCode) => {
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
       // code 3: MEDIA_ERR_DECODE
